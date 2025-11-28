@@ -38,8 +38,11 @@ Navigate to "Data Ingestion" and upload a ball-by-ball cricket CSV file with the
 - `bowling_team`
 - `striker`
 - `bowler`
-- `total_runs`
+- `runs_off_bat`
+- `extras`
 - `venue`
+
+The platform automatically creates a `total_runs` column from `runs_off_bat` and `extras`.
 
 ### 3. Train Model
 

@@ -366,14 +366,15 @@ def show_upload_page():
     st.markdown("""
     <div class="info-box">
         <h4>Required Schema</h4>
-        <p>Ensure your dataset contains the following columns:</p>
+        <p>Ensure your dataset contains the following columns (Cricsheet format):</p>
         <ul>
             <li><code>match_id</code></li>
             <li><code>batting_team</code></li>
             <li><code>bowling_team</code></li>
             <li><code>striker</code></li>
             <li><code>bowler</code></li>
-            <li><code>total_runs</code></li>
+            <li><code>runs_off_bat</code></li>
+            <li><code>extras</code></li>
             <li><code>venue</code></li>
         </ul>
     </div>
@@ -402,9 +403,9 @@ def show_upload_page():
             
             st.success("File uploaded successfully")
             
-            # Validate columns
+            # Validate columns (Cricsheet format)
             required_cols = ['match_id', 'batting_team', 'bowling_team', 'striker', 
-                           'bowler', 'total_runs', 'venue']
+                           'bowler', 'runs_off_bat', 'extras', 'venue']
             missing_cols = [col for col in required_cols if col not in df.columns]
             
             if missing_cols:
