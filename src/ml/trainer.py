@@ -13,7 +13,7 @@ import os
 from datetime import datetime
 
 from src.data.data_loader import DataLoader
-from src.fantasy.points_calculator import calculate_fantasy_points
+from src.fantasy.points_calculator import FantasyPointsCalculator
 from src.features.player_features import (extract_batting_features, extract_bowling_features,
                                          extract_form_features, extract_consistency_features)
 from src.features.contextual_features import extract_ground_features, extract_opposition_features
@@ -48,7 +48,8 @@ def train_model_from_dataframe(df: pd.DataFrame, progress_callback=None, league_
         
         # Calculate fantasy points
         update_progress("Calculating fantasy points...", 10)
-        match_player_points = calculate_fantasy_points(df)
+        calculator = FantasyPointsCalculator(df)
+        match_player_points = calculator.create_training_dataset()
         
         if len(match_player_points) == 0:
             raise ValueError("No player-match records found in dataset")
