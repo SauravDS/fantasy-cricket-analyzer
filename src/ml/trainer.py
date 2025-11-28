@@ -40,8 +40,17 @@ def train_model_from_dataframe(df: pd.DataFrame, progress_callback=None, league_
     try:
         # Validate DataFrame
         update_progress("Validating dataset...", 5)
-        required_cols = ['match_id', 'batting_team', 'bowling_team', 'striker', 
-                        'bowler', 'total_runs', 'venue']
+        
+        # Check for Cricsheet format columns (runs_off_bat + extras) or total_runs
+        if 'total_runs' not in df.columns:
+            if 'runs_off_bat' in df.columns and 'extras' in df.columns:
+                # Create total_runs from Cricsheet format
+                df['total_runs'] = df['runs_off_bat'].fillna(0) + df['extras'].fillna(0)
+            else:
+                raise ValueError("Dataset must have either 'total_runs' column or both 'runs_off_bat' and 'extras' columns")
+        
+        # Validate remaining required columns
+        required_cols = ['match_id', 'batting_team', 'bowling_team', 'striker', 'bowler', 'venue']
         missing = [col for col in required_cols if col not in df.columns]
         if missing:
             raise ValueError(f"Missing required columns: {missing}")
