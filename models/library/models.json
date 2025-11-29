@@ -1,0 +1,13 @@
+{
+  "models": [
+    {
+      "model_name": "T20_League_20251129_081302",
+      "league_name": "T20 League",
+      "n_matches": 435,
+      "n_teams": 8,
+      "best_model": "Gradient Boosting",
+      "r2_score": 0.75,
+      "saved_at": "2025-11-29 08:13:02"
+    }
+  ]
+}

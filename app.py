@@ -266,25 +266,28 @@ def main():
         st.markdown("### FCA Platform")
         st.markdown("---")
         
+        # Model Library - Always accessible
+        if st.button("📚 Model Library", use_container_width=True):
+            page = "Model Library"
+        
+        st.markdown("---")
+        
         # Check if dataset is uploaded and model trained
         if st.session_state.uploaded_data is None:
-            page = "Data Ingestion"
+            page = "Data Ingestion" if 'page' not in locals() else page
             st.info("Please upload a dataset to proceed.")
         elif not st.session_state.model_trained:
-            page = "Model Training"
+            page = "Model Training" if 'page' not in locals() else page
             st.info("Model training required.")
         else:
-            page = st.radio(
-                "Navigation",
-                ["Analytics Dashboard", "Squad Configuration", "Venue Analysis", 
-                 "Roster Management", "Performance Forecast"],
-                label_visibility="collapsed"
-            )
-            
-            # Model Library button
-            st.markdown("---")
-            if st.button("Model Library", use_container_width=True):
-                page = "Model Library"
+            # Only show main navigation if Model Library wasn't clicked
+            if 'page' not in locals() or page != "Model Library":
+                page = st.radio(
+                    "Navigation",
+                    ["Analytics Dashboard", "Squad Configuration", "Venue Analysis", 
+                     "Roster Management", "Performance Forecast"],
+                    label_visibility="collapsed"
+                )
             
             # Add option to change dataset
             st.markdown("---")
@@ -429,13 +432,38 @@ def show_upload_page():
             
             # Confirm button
             st.markdown("---")
-            if st.button("Initialize & Proceed to Training", type="primary", use_container_width=True):
-                st.session_state.uploaded_data = df
-                st.session_state.current_league = league_name
-                st.session_state.model_trained = False
-                st.session_state.data_loaded = False
-                st.success("Dataset loaded. Proceeding to training protocol.")
-                st.rerun()
+            
+            # Check if model is already loaded
+            if st.session_state.model_trained and st.session_state.loaded_model_name:
+                st.info(f"✓ Model '{st.session_state.loaded_model_name}' is currently loaded")
+                
+                col1, col2 = st.columns(2)
+                with col1:
+                    if st.button("Proceed with Loaded Model", type="primary", use_container_width=True):
+                        st.session_state.uploaded_data = df
+                        st.session_state.current_league = league_name
+                        st.session_state.data_loaded = False
+                        # Keep model_trained = True
+                        st.success("Dataset loaded. Proceeding with existing model.")
+                        st.rerun()
+                
+                with col2:
+                    if st.button("Train New Model", use_container_width=True):
+                        st.session_state.uploaded_data = df
+                        st.session_state.current_league = league_name
+                        st.session_state.model_trained = False
+                        st.session_state.data_loaded = False
+                        st.session_state.loaded_model_name = None
+                        st.success("Dataset loaded. Proceeding to training protocol.")
+                        st.rerun()
+            else:
+                if st.button("Initialize & Proceed to Training", type="primary", use_container_width=True):
+                    st.session_state.uploaded_data = df
+                    st.session_state.current_league = league_name
+                    st.session_state.model_trained = False
+                    st.session_state.data_loaded = False
+                    st.success("Dataset loaded. Proceeding to training protocol.")
+                    st.rerun()
                 
         except Exception as e:
             st.error(f"Error reading file: {str(e)}")
@@ -533,8 +561,10 @@ def show_training_page():
             with col3:
                 st.metric("MAE", f"{scores['mae']:.2f}")
             
-            # Save model info
+            # Save model info and trained model to session state
             st.session_state.model_info = model_info
+            st.session_state.trained_model = model
+            st.session_state.trained_feature_names = feature_names
             st.session_state.model_trained = True
             
             # Option to save model to library
@@ -555,7 +585,12 @@ def show_training_page():
                     library = ModelLibrary()
                     
                     try:
-                        library.save_model(model, feature_names, model_info, model_save_name)
+                        library.save_model(
+                            st.session_state.trained_model,
+                            st.session_state.trained_feature_names,
+                            st.session_state.model_info,
+                            model_save_name
+                        )
                         st.success(f"Model saved: {model_save_name}")
                     except Exception as e:
                         st.error(f"Save failed: {str(e)}")
@@ -632,8 +667,8 @@ def show_model_library_page():
                         st.session_state.model_trained = True
                         st.session_state.loaded_model_name = model['model_name']
                         
-                        st.success(f"Loaded: {model['model_name']}")
-                        st.info("Please ensure corresponding dataset is uploaded.")
+                        st.success(f"✓ Model loaded: {model['model_name']}")
+                        st.info("📂 Next: Upload the dataset for this league via Data Ingestion page")
                         st.rerun()
                     except Exception as e:
                         st.error(f"Load failed: {str(e)}")
@@ -667,7 +702,7 @@ def show_home_page():
     col1, col2, col3 = st.columns(3)
     
     with col1:
-        st.markdown("""
+        st.markdown(f"""
         <div class="material-card" style="text-align: center;">
             <div class="kpi-label" style="color: #5F6368;">Active Teams</div>
             <div class="kpi-value" style="color: #3F51B5;">{st.session_state.df['batting_team'].nunique() if st.session_state.df is not None else 0}</div>

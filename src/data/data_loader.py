@@ -12,36 +12,40 @@ import os
 class DataLoader:
     """Load and manage CSA T20 Challenge ball-by-ball data."""
     
-    def __init__(self, csv_path: str = "all_matches.csv"):
+    def __init__(self, csv_path_or_df=None):
         """
-        Initialize DataLoader with CSV path.
+        Initialize DataLoader with CSV path or DataFrame.
         
         Args:
-            csv_path: Path to the all_matches.csv file
+            csv_path_or_df: Either path to CSV file (str) or pandas DataFrame
         """
-        self.csv_path = csv_path
-        self.df = None
+        if csv_path_or_df is None:
+            csv_path_or_df = "all_matches.csv"
+            
+        # Check if input is DataFrame or path
+        if isinstance(csv_path_or_df, pd.DataFrame):
+            # Direct DataFrame provided
+            self.csv_path = None
+            self.df = csv_path_or_df
+            # Apply preprocessing
+            self._preprocess_dataframe()
+        else:
+            # CSV path provided
+            self.csv_path = csv_path_or_df
+            self.df = None
+            
         self._teams = None
         self._venues = None
         self._players = None
-        
-    def load_dataset(self) -> pd.DataFrame:
-        """
-        Load and preprocess the CSV dataset.
-        
-        Returns:
-            DataFrame with preprocessed match data
-        """
-        print(f"Loading dataset from {self.csv_path}...")
-        self.df = pd.read_csv(self.csv_path)
-        
-        print(f"Loaded {len(self.df)} ball records from {self.df['match_id'].nunique()} matches")
-        
+    
+    def _preprocess_dataframe(self):
+        """Apply standard preprocessing to loaded DataFrame."""
         # Create derived columns
         self.df['total_runs'] = self.df['runs_off_bat'].fillna(0) + self.df['extras'].fillna(0)
         
-        # Convert date to datetime
-        self.df['start_date'] = pd.to_datetime(self.df['start_date'])
+        # Convert date to datetime if column exists
+        if 'start_date' in self.df.columns:
+            self.df['start_date'] = pd.to_datetime(self.df['start_date'])
         
         # Fill NaN values for wicket-related columns
         self.df['wicket_type'] = self.df['wicket_type'].fillna('none')
@@ -57,6 +61,21 @@ class DataLoader:
         
         # Create dot ball flag (no runs scored)
         self.df['is_dot'] = self.df['total_runs'] == 0
+        
+    def load_dataset(self) -> pd.DataFrame:
+        """
+        Load and preprocess the CSV dataset.
+        
+        Returns:
+            DataFrame with preprocessed match data
+        """
+        print(f"Loading dataset from {self.csv_path}...")
+        self.df = pd.read_csv(self.csv_path)
+        
+        print(f"Loaded {len(self.df)} ball records from {self.df['match_id'].nunique()} matches")
+        
+        # Apply preprocessing
+        self._preprocess_dataframe()
         
         print("Dataset preprocessing complete!")
         return self.df
