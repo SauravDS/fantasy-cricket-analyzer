@@ -571,6 +571,16 @@ def show_training_page():
             st.session_state.trained_feature_names = feature_names
             st.session_state.model_trained = True
             
+            # Auto-save to library
+            try:
+                from src.ml.model_library import ModelLibrary
+                library = ModelLibrary()
+                auto_save_name = f"AutoSave_{st.session_state.current_league}_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+                library.save_model(model, feature_names, model_info, auto_save_name)
+                st.success(f"✓ Model automatically saved to library as: {auto_save_name}")
+            except Exception as e:
+                st.warning(f"Auto-save failed: {str(e)}")
+            
             # Option to save model to library
             st.markdown("---")
             st.markdown("#### Save to Repository")
@@ -986,7 +996,8 @@ def show_predictions_page():
                 # Get historical data for features
                 hist_df = st.session_state.df
                 
-                from src.ml.feature_engineering import extract_batting_features, extract_bowling_features, extract_form_features, extract_consistency_features, extract_ground_features, extract_opposition_features
+                from src.features.player_features import extract_batting_features, extract_bowling_features, extract_form_features, extract_consistency_features
+                from src.features.contextual_features import extract_ground_features, extract_opposition_features
                 
                 for player in st.session_state.selected_players:
                     # Extract features
