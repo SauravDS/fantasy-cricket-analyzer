@@ -882,8 +882,8 @@ def show_player_pool_page():
     all_unique_players = sorted(list(set().union(*all_team_players.values())))
     match_team_players = st.session_state.loader.get_players([team1, team2])
     
-    st.markdown(f"**Available Pool:** {len(all_unique_players)} Players")
-    st.info("Select exactly 22 players for the analysis pool.")
+    st.markdown(f\"**Available Pool:** {len(all_unique_players)} Players\")
+    st.info("Select players for your analysis pool (at least 1 required).")
     
     # Selection Logic
     col_search, col_add = st.columns([3, 1])
@@ -910,7 +910,7 @@ def show_player_pool_page():
     
     # Selected List
     st.markdown("---")
-    st.markdown(f"#### Selected Squad ({len(st.session_state.selected_players)}/22)")
+    st.markdown(f"#### Selected Squad ({len(st.session_state.selected_players)} players)")
     
     if not st.session_state.selected_players:
         st.info("No players selected.")
@@ -957,12 +957,10 @@ def show_player_pool_page():
         st.session_state.player_team_tags = player_tags
 
     st.markdown("---")
-    if len(st.session_state.selected_players) == 22:
-        st.success("Roster Complete. Ready for analysis.")
-    elif len(st.session_state.selected_players) > 22:
-        st.error(f"Too many players! Remove {len(st.session_state.selected_players) - 22}.")
+    if len(st.session_state.selected_players) >= 1:
+        st.success(f"✓ {len(st.session_state.selected_players)} players selected. Ready for analysis.")
     else:
-        st.warning(f"Select {22 - len(st.session_state.selected_players)} more players.")
+        st.warning("Select at least 1 player to proceed.")
 
 
 def show_predictions_page():
