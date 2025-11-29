@@ -882,7 +882,7 @@ def show_player_pool_page():
     all_unique_players = sorted(list(set().union(*all_team_players.values())))
     match_team_players = st.session_state.loader.get_players([team1, team2])
     
-    st.markdown(f\"**Available Pool:** {len(all_unique_players)} Players\")
+    st.markdown(f"**Available Pool:** {len(all_unique_players)} Players")
     st.info("Select players for your analysis pool (at least 1 required).")
     
     # Selection Logic
