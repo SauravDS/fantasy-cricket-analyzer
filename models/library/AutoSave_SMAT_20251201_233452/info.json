@@ -1,0 +1,27 @@
+{
+  "league_name": "SMAT",
+  "best_model": "Gradient Boosting",
+  "model_scores": {
+    "Random Forest": {
+      "r2": -0.01634855649462419,
+      "mae": 50.397604820619335,
+      "rmse": 63.487308641345614
+    },
+    "XGBoost": {
+      "r2": -0.06175802712684009,
+      "mae": 51.21534571619758,
+      "rmse": 64.89008693555154
+    },
+    "Gradient Boosting": {
+      "r2": 0.035039273016090555,
+      "mae": 48.91948886295922,
+      "rmse": 61.8614931905411
+    }
+  },
+  "n_samples": 14615,
+  "n_matches": 695,
+  "n_teams": 39,
+  "trained_at": "2025-12-01 23:34:52",
+  "model_name": "AutoSave_SMAT_20251201_233452",
+  "saved_at": "2025-12-01 23:34:52"
+}

@@ -17,6 +17,15 @@
       "best_model": "Gradient Boosting",
       "r2_score": 0.0889584989454747,
       "saved_at": "2025-12-01 02:53:03"
+    },
+    {
+      "model_name": "AutoSave_SMAT_20251201_233452",
+      "league_name": "SMAT",
+      "n_matches": 695,
+      "n_teams": 39,
+      "best_model": "Gradient Boosting",
+      "r2_score": 0.035039273016090555,
+      "saved_at": "2025-12-01 23:34:52"
     }
   ]
 }
